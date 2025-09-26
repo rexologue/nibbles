@@ -34,11 +34,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    // Метрики (берём по objectName из .ui)
-    m_lblN    = ui->findChild<QLabel*>("lblN");
-    m_lblH    = ui->findChild<QLabel*>("lblH");
-    m_lblHmax = ui->findChild<QLabel*>("lblHmax");
-    m_lblHref = ui->findChild<QLabel*>("lblHref");
+    // Метрики (указатели приходят напрямую из ui)
+    m_lblN    = ui->lblN;
+    m_lblH    = ui->lblH;
+    m_lblHmax = ui->lblHmax;
+    m_lblHref = ui->lblHref;
 
     // Начальные значения
     if (m_lblN)    m_lblN->setText("–");
