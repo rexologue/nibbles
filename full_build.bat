@@ -35,7 +35,7 @@ echo [4/6] Building project...
 cmake --build build/Release --config Release -j || goto :error
 
 echo [5/6] Deploying Qt libraries...
-"%WINDEPLOYQT%" build\Release\bin\Release\nibbles.exe --dir build\Release\bin\Release --release || goto :error
+"%WINDEPLOYQT%" build\Release\src\Release\nibbles.exe --dir build\Release\src\Release --release || goto :error
 
 echo [6/6] Done!
 echo === BUILD SUCCESSFUL ===
