@@ -1,10 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"          // генерируется из mainwindow.ui
+
+#include <QAction>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QLabel>
 #include <QStatusBar>
 #include <QTableView>
+
+#include <utility>
+#include <vector>
 
 #include "scheme_model.h"
 
@@ -65,10 +72,10 @@ void MainWindow::loadFile(const QString& path)
 {
     try {
         // 1) читаем файл → нибблы
-        std::vector<Nibble> nibbles = file_to_nibbles(path.toStdString());
+        std::vector<Nibble> nibbleSequence = nibble_io::file_to_nibbles(path.toStdString());
 
         // 2) считаем схему переходов
-        Scheme sch(std::move(nibbles));
+        Scheme sch(std::move(nibbleSequence));
         const auto& T = sch.table(); // std::array<std::array<double,16>,16>
 
         // 3) обновляем модель таблицы
