@@ -75,57 +75,94 @@ void MainWindow::openFile()
 void MainWindow::packFile()
 {
     const QString sourcePath = QFileDialog::getOpenFileName(
-        this, tr("Выбор файла для упаковки"), QString(), tr("Все файлы (*.*)")
+        this,
+        tr("Выбор файла для упаковки"),
+        QString(),
+        tr("Все файлы (*.*)")
     );
     if (sourcePath.isEmpty()) {
         return;
     }
 
-    const QString saveDir = QFileDialog::getExistingDirectory(
-        this, tr("Выбор папки для сохранения"), QString()
+    // Имя по умолчанию = имя исходного файла + .nibble
+    const QString defaultArchiveName =
+        QFileInfo(sourcePath).completeBaseName() + QStringLiteral(".nibble");
+    const QString initialPath =
+        QFileInfo(sourcePath).dir().filePath(defaultArchiveName);
+
+    // Здесь пользователь выбирает папку и вводит имя файла
+    QString archivePath = QFileDialog::getSaveFileName(
+        this,
+        tr("Сохранить архив как"),
+        initialPath,
+        tr("Nibble архивы (*.nibble)")
     );
-    if (saveDir.isEmpty()) {
+    if (archivePath.isEmpty()) {
         return;
+    }
+
+    // Гарантируем расширение .nibble
+    if (!archivePath.endsWith(QStringLiteral(".nibble"), Qt::CaseInsensitive)) {
+        archivePath += QStringLiteral(".nibble");
     }
 
     try
     {
-        const std::vector<Nibble> nibbles = nibble_io::file_to_nibbles(sourcePath.toStdString());
+        const std::vector<Nibble> nibbles =
+            nibble_io::file_to_nibbles(sourcePath.toStdString());
 
         NibbleIntervalArchiever archiever;
-        const QString archiveName = QFileInfo(sourcePath).completeBaseName() + QStringLiteral(".nibble");
-        const QString archivePath = QDir(saveDir).filePath(archiveName);
-
         archiever.pack(nibbles, archivePath.toStdString());
 
-        statusBar()->showMessage(tr("Файл упакован: %1").arg(QFileInfo(archivePath).fileName()), 4000);
+        statusBar()->showMessage(
+            tr("Файл упакован: %1").arg(QFileInfo(archivePath).fileName()),
+            4000
+        );
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, tr("Ошибка"),
-                              tr("Не удалось упаковать файл:\n%1")
-                                  .arg(QString::fromLocal8Bit(e.what())));
+        QMessageBox::critical(
+            this,
+            tr("Ошибка"),
+            tr("Не удалось упаковать файл:\n%1")
+                .arg(QString::fromLocal8Bit(e.what()))
+        );
     }
     catch (...)
     {
-        QMessageBox::critical(this, tr("Ошибка"),
-                              tr("Неизвестная ошибка при упаковке файла."));
+        QMessageBox::critical(
+            this,
+            tr("Ошибка"),
+            tr("Неизвестная ошибка при упаковке файла.")
+        );
     }
 }
 
 void MainWindow::unpackFile()
 {
     const QString archivePath = QFileDialog::getOpenFileName(
-        this, tr("Выбор архива .nibble"), QString(), tr("Nibble архивы (*.nibble);;Все файлы (*.*)")
+        this,
+        tr("Выбор архива .nibble"),
+        QString(),
+        tr("Nibble архивы (*.nibble);;Все файлы (*.*)")
     );
     if (archivePath.isEmpty()) {
         return;
     }
 
-    const QString saveDir = QFileDialog::getExistingDirectory(
-        this, tr("Выбор папки для распаковки"), QString()
+    // Имя по умолчанию — baseName архива (без .nibble), директория — папка архива
+    const QString defaultUnpackedName = QFileInfo(archivePath).completeBaseName();
+    const QString initialTargetPath =
+        QFileInfo(archivePath).dir().filePath(defaultUnpackedName);
+
+    // Пользователь сам выбирает папку и вводит любое имя + расширение
+    QString targetPath = QFileDialog::getSaveFileName(
+        this,
+        tr("Сохранить распакованный файл как"),
+        initialTargetPath,
+        tr("Все файлы (*.*)")
     );
-    if (saveDir.isEmpty()) {
+    if (targetPath.isEmpty()) {
         return;
     }
 
@@ -134,23 +171,29 @@ void MainWindow::unpackFile()
         NibbleIntervalArchiever archiever;
         const std::vector<Nibble> nibbles = archiever.unpack(archivePath.toStdString());
 
-        const QString unpackedName = QFileInfo(archivePath).completeBaseName();
-        const QString targetPath = QDir(saveDir).filePath(unpackedName);
-
         nibble_io::write_nibbles_to_file(targetPath.toStdString(), nibbles);
 
-        statusBar()->showMessage(tr("Файл распакован: %1").arg(QFileInfo(targetPath).fileName()), 4000);
+        statusBar()->showMessage(
+            tr("Файл распакован: %1").arg(QFileInfo(targetPath).fileName()),
+            4000
+        );
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, tr("Ошибка"),
-                              tr("Не удалось распаковать файл:\n%1")
-                                  .arg(QString::fromLocal8Bit(e.what())));
+        QMessageBox::critical(
+            this,
+            tr("Ошибка"),
+            tr("Не удалось распаковать файл:\n%1")
+                .arg(QString::fromLocal8Bit(e.what()))
+        );
     }
     catch (...)
     {
-        QMessageBox::critical(this, tr("Ошибка"),
-                              tr("Неизвестная ошибка при распаковке файла."));
+        QMessageBox::critical(
+            this,
+            tr("Ошибка"),
+            tr("Неизвестная ошибка при распаковке файла.")
+        );
     }
 }
 
