@@ -106,6 +106,28 @@ inline std::vector<Nibble> NibbleIntervalArchiever::decode(const std::vector<std
     return nibbles;
 }
 
+inline void NibbleIntervalArchiever::pack(const std::vector<Nibble> &nibbles,
+                                          const std::string& path)
+{
+    std::vector<std::uint64_t> encoded_nibbles = encode(nibbles);
+
+    std::ofstream f(path, std::ios::binary | std::ios::trunc);
+    if (!f) {
+        throw std::runtime_error("Cannot open file for writing: " + path);
+    }
+
+    if (!encoded_nibbles.empty()) {
+        const auto bytes =
+            static_cast<std::streamsize>(encoded_nibbles.size() * sizeof(std::uint64_t));
+
+        f.write(reinterpret_cast<const char*>(encoded_nibbles.data()), bytes);
+        if (!f) {
+            throw std::runtime_error("Failed to write all data to file: " + path);
+        }
+    }
+}
+
+
 inline std::vector<Nibble> NibbleIntervalArchiever::unpack(const std::string &path)
 {
     std::ifstream f(path, std::ios::binary);

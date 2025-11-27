@@ -5,6 +5,7 @@
   <property name="windowTitle">
    <string>Nibble Entropy GUI</string>
   </property>
+
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
     <property name="spacing">
@@ -146,7 +147,12 @@
   <!-- Меню -->
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
-    <rect><x>0</x><y>0</y><width>800</width><height>22</height></rect>
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>22</height>
+    </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -166,6 +172,12 @@
    <property name="windowTitle">
     <string>Файл</string>
    </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionPack"/>
    <addaction name="actionUnpack"/>
@@ -182,7 +194,8 @@
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
-    <action name="actionPack">
+  </action>     
+  <action name="actionPack">
    <property name="text">
     <string>Упаковать…</string>
    </property>
@@ -191,7 +204,6 @@
    <property name="text">
     <string>Распаковать…</string>
    </property>
-  </action>
   </action>
   <action name="actionExit">
    <property name="text">
