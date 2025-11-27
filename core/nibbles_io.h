@@ -1,11 +1,11 @@
 #pragma once
 
+#include <string>
+#include <vector>
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
 #include "nibble.h"
 
@@ -57,6 +57,39 @@ inline std::vector<Nibble> file_to_nibbles(const std::string& path)
     const auto bytes = read_to_bin(path);
     return convert_to_nibbles(bytes);
 }
+
+inline void write_nibbles_to_file(const std::string& path,
+                                  const std::vector<Nibble>& nibbles)
+{
+    // Для корректного восстановления байтов количество нибблов должно быть чётным
+    if (nibbles.size() % 2 != 0) {
+        throw std::runtime_error("Number of nibbles must be even to form bytes");
+    }
+
+    std::vector<std::uint8_t> bytes;
+    bytes.reserve(nibbles.size() / 2);
+
+    for (std::size_t i = 0; i < nibbles.size(); i += 2) {
+        // первый ниббл — старшая тетрада, второй — младшая
+        const std::uint8_t hi = static_cast<std::uint8_t>(nibbles[i].value()     & 0x0F);
+        const std::uint8_t lo = static_cast<std::uint8_t>(nibbles[i + 1].value() & 0x0F);
+        bytes.push_back(static_cast<std::uint8_t>((hi << 4) | lo));
+    }
+
+    std::ofstream f(path, std::ios::binary | std::ios::trunc);
+    if (!f) {
+        throw std::runtime_error("Cannot open file for writing: " + path);
+    }
+
+    if (!bytes.empty()) {
+        f.write(reinterpret_cast<const char*>(bytes.data()),
+                static_cast<std::streamsize>(bytes.size()));
+        if (!f) {
+            throw std::runtime_error("Failed to write all data to file: " + path);
+        }
+    }
+}
+
 
 } // namespace nibble_io
 

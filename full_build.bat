@@ -1,26 +1,28 @@
 @echo off
 setlocal
 
-set "ROOT=%USERPROFILE%\.conan2"
-set "TARGET=windeployqt.exe"
+@REM set "ROOT=%USERPROFILE%\.conan2"
+@REM set "TARGET=windeployqt.exe"
 
-echo [0/6] Searching for %TARGET% in %ROOT% ...
+@REM echo [0/6] Searching for %TARGET% in %ROOT% ...
 
-set "WINDEPLOYQT="
+@REM set "WINDEPLOYQT="
 
-for /r "%ROOT%" %%f in (*%TARGET%) do (
-    if /i "%%~nxf"=="%TARGET%" (
-        set "WINDEPLOYQT=%%~f"
-        goto :found
-    )
-)
+@REM for /r "%ROOT%" %%f in (*%TARGET%) do (
+@REM     if /i "%%~nxf"=="%TARGET%" (
+@REM         set "WINDEPLOYQT=%%~f"
+@REM         goto :found
+@REM     )
+@REM )
 
-echo [ERROR] %TARGET% not found in %ROOT%
-exit /b 1
+@REM echo [ERROR] %TARGET% not found in %ROOT%
+@REM exit /b 1
 
-:found
-echo Found windeployqt: %WINDEPLOYQT%
+@REM :found
+@REM echo Found windeployqt: %WINDEPLOYQT%
 echo.
+
+set "WINDEPLOYQT=C:\Users\USER1\.conan2\p\b\qt28524c8cef4eb\b\build\Release\qtbase\bin\windeployqt.exe"
 
 echo [1/6] Installing Python dependencies...
 poetry install --no-root || goto :error

@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"          // генерируется из mainwindow.ui
+#include "ui_mainwindow.h"          
 
 #include <QAction>
 #include <QFileDialog>
@@ -15,10 +15,11 @@
 
 #include "scheme_model.h"
 
-// Ваши существующие заголовки
-#include "file_to_nibbles.h"
+// core
 #include "nibble.h"
 #include "scheme.h"
+#include "nibbles_io.h"
+#include "nibble_intervals.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -70,7 +71,8 @@ void MainWindow::openFile()
 
 void MainWindow::loadFile(const QString& path)
 {
-    try {
+    try 
+    {
         // 1) читаем файл → нибблы
         std::vector<Nibble> nibbleSequence = nibble_io::file_to_nibbles(path.toStdString());
 
@@ -93,11 +95,15 @@ void MainWindow::loadFile(const QString& path)
         if (m_lblHref) m_lblHref->setText(QString::number(Hrel, 'f', 4));
 
         statusBar()->showMessage(tr("Загружено: %1").arg(QFileInfo(path).fileName()), 4000);
-    } catch (const std::exception& e) {
+    } 
+    catch (const std::exception& e) 
+    {
         QMessageBox::critical(this, tr("Ошибка"),
                               tr("Не удалось обработать файл:\n%1")
                               .arg(QString::fromLocal8Bit(e.what())));
-    } catch (...) {
+    } 
+    catch (...) 
+    {
         QMessageBox::critical(this, tr("Ошибка"),
                               tr("Неизвестная ошибка при обработке файла."));
     }

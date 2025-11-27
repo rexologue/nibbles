@@ -1,14 +1,17 @@
 #pragma once
+
 #ifndef NIBBLE_H
 #define NIBBLE_H
 
 #include <string>
 
 typedef unsigned char uchar;
+const uchar MAX_NIBBLE_VALUE = 15;
 
 class Nibble
 {
 public:
+    Nibble() : m_label("s1") { m_bytes[0] = 0; }
     // Конструктор из готового значения ниббла (0..15)
     explicit Nibble(uchar nib)
     {
