@@ -106,43 +106,46 @@ inline std::vector<Nibble> NibbleIntervalArchiever::decode(const std::vector<std
     return nibbles;
 }
 
-inline void NibbleIntervalArchiever::pack(const std::vector<Nibble> &nibbles, const std::string& path)
-{
-    std::vector<std::uint64_t> encoded_nibbles = encode(nibbles);
-    std::ofstream f(path, std::ios::binary | std::ios::trunc);
-
-    if (!f) {
-        throw std::runtime_error("Cannot open file: " + path);
-    }
-
-    f.write(reinterpret_cast<const char*>(encoded_nibbles.data()), 
-            static_cast<std::streamsize>(encoded_nibbles.size() * sizeof(std::uint64_t)));
-
-    if (!f) 
-    {
-        throw std::runtime_error("Failed to write all data to file: " + path);
-    }
-}
-
 inline std::vector<Nibble> NibbleIntervalArchiever::unpack(const std::string &path)
 {
     std::ifstream f(path, std::ios::binary);
+    if (!f) {
+        throw std::runtime_error("Cannot open file for reading: " + path);
+    }
 
+    // Определяем размер файла
     f.seekg(0, std::ios::end);
     const std::streampos sz = f.tellg();
     if (sz < std::streampos{0}) {
         throw std::runtime_error("Cannot determine file size: " + path);
     }
+    if (sz == std::streampos{0}) {
+        // Пустой файл — пустой набор нибблов
+        return {};
+    }
+
+    // Проверяем, что размер кратен sizeof(uint64_t)
+    const auto uint64_size = static_cast<std::streampos>(sizeof(std::uint64_t));
+    if (sz % uint64_size != std::streampos{0}) {
+        throw std::runtime_error("File size is not multiple of uint64_t size: " + path);
+    }
+
     f.seekg(0, std::ios::beg);
 
-    std::vector<std::uint64_t> encoded_nibbles(static_cast<std::size_t>(sz) / sizeof(std::uint64_t));
+    const std::size_t count =
+        static_cast<std::size_t>(sz / uint64_size);
+    std::vector<std::uint64_t> encoded_nibbles(count);
 
-    f.read(reinterpret_cast<char*>(encoded_nibbles.data()), sz);
-    if (f.gcount() != static_cast<std::streamsize>(sz)) {
+    const auto bytes =
+        static_cast<std::streamsize>(count * sizeof(std::uint64_t));
+
+    f.read(reinterpret_cast<char*>(encoded_nibbles.data()), bytes);
+    if (f.gcount() != bytes) {
         throw std::runtime_error("Failed to read entire file: " + path);
     }
 
     return decode(encoded_nibbles);
 }
+
 
 #endif // NIBBLE_INTERVALS_H

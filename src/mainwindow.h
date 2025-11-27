@@ -19,6 +19,8 @@ public:
 
 private slots:
     void openFile();
+    void packFile();
+    void unpackFile();
 
 private:
     void loadFile(const QString& path);
